@@ -123,6 +123,50 @@ html.thankyou-page body #thanks{display:flex!important;min-height:100vh!importan
 body.thankyou > *:not(#thanks){display:none!important}
 body.thankyou #thanks{display:flex!important;min-height:100vh!important}
 </style>
+
+<style id="hide-hero-order-button">
+.hero .btn[href="#order"]{display:none!important}
+</style>
+
+
+
+<style id="confirm-button-final">
+#submitBtn.confirm-order-btn{
+  display:none !important;
+  width:100% !important;
+}
+#submitBtn.confirm-order-btn.show-after-fill{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+</style>
+
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;
+  var ttq=w[t]=w[t]||[];
+  ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+  ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+  for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+  ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};
+  ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};
+  n=document.createElement("script");n.type="text/javascript";n.async=!0;n.src=r+"?sdkid="+e+"&lib="+t;
+  e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+  ttq.load('DAE2TGJC77UC8FLJNEQG');
+  ttq.page();
+  ttq.track('ViewContent', {
+    content_id: 'bunny-bra',
+    content_name: 'Bunny Bra',
+    content_type: 'product',
+    value: 2999,
+    currency: 'PKR'
+  });
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+
 </head><body>
 <div class="topbar">💗 CUTE BUNNY COLLECTION • SOFT LOOK • ORDER ONLINE</div>
 <header><div class="wrap nav"><div class="logo">Bunny<span class="heart">Bra ♥</span><small>CUTE • COZY • PLAYFUL</small></div>
@@ -142,9 +186,9 @@ body.thankyou #thanks{display:flex!important;min-height:100vh!important}
 <div class="field"><label>FULL NAME</label><input id="name" required placeholder="Your full name"></div>
 <div class="field"><label>PHONE NUMBER</label><input id="phone" required type="tel" placeholder="03XX XXXXXXX"></div>
 <div class="field"><label>COMPLETE ADDRESS</label><textarea id="address" required placeholder="Street, area, building... "></textarea></div>
-<div class="field"><label>NEAR FAMOUS PLACE / LANDMARK</label><input id="landmark" name="landmark" required placeholder="e.g. Near Main Market"></div>
+<div class="field"><label>NEAR FAMOUS PLACE / LANDMARK</label><input id="landmark" name="landmark" placeholder="e.g. Near Main Market (Optional)"></div>
 <div class="field"><label>CITY</label><input id="city" required placeholder="Your city"></div>
-<div class="total"><span>Total</span><span id="total">Rs. 2,999</span></div><button class="btn full" type="submit" id="submitBtn">CONFIRM MY ORDER 💗</button>
+<div class="total"><span>Total</span><span id="total">Rs. 2,999</span></div><button class="btn full" type="submit" id="submitBtn" class="confirm-order-btn">CONFIRM MY ORDER 💗</button>
 <p class="note">Please double-check your phone number, size and address before submitting.</p></form></div></div></section><section class="section reviews" id="reviews"><div class="wrap">
 <h2>Girls Kya Kehti Hain Is Product Ke Bare Mein? 💗</h2>
 
@@ -189,6 +233,12 @@ updateTotal();
 document.getElementById('orderForm').addEventListener('submit', async function(e){
   e.preventDefault();
 
+  const form = this;
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = 'ORDER SUBMITTING...';
@@ -222,28 +272,6 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     alert('Order submit nahi hua. Please dobara try karein.');
   }
 });
-const sampleOrders = [
-  {name:'Ayesha', city:'Lahore'},
-  {name:'Sana', city:'Karachi'},
-  {name:'Hira', city:'Islamabad'},
-  {name:'Maham', city:'Rawalpindi'},
-  {name:'Iqra', city:'Faisalabad'},
-  {name:'Zoya', city:'Multan'},
-  {name:'Alina', city:'Peshawar'},
-  {name:'Anaya', city:'Gujranwala'},
-  {name:'Eman', city:'Sialkot'},
-  {name:'Mehwish', city:'Hyderabad'}
-];
-let sampleOrderIndex = 0;
-function showSampleOrder(){
-  const item = sampleOrders[sampleOrderIndex];
-  sampleOrderIndex = (sampleOrderIndex + 1) % sampleOrders.length;
-  const text = document.getElementById('orderText');
-  if(text) text.textContent = 'Sample: ' + item.name + ' from ' + item.city + ' just ordered Bunny Bra.';
-}
-showSampleOrder();
-setInterval(showSampleOrder, 3500);
-
 </script>
 
 
@@ -275,4 +303,69 @@ document.addEventListener('DOMContentLoaded', function(){
   setInterval(show,3500);
 });
 </script>
+
+
+
+<script id="confirm-button-final-js">
+document.addEventListener('DOMContentLoaded', function(){
+  const form = document.getElementById('orderForm');
+  const btn = document.getElementById('submitBtn');
+  if(!form || !btn) return;
+
+  const ids = ['quantity','size','name','phone','address','city'];
+
+  function updateConfirmButton(){
+    const complete = ids.every(function(id){
+      const el = document.getElementById(id);
+      return el && String(el.value || '').trim().length > 0;
+    });
+    btn.classList.toggle('show-after-fill', complete);
+  }
+
+  ids.forEach(function(id){
+    const el = document.getElementById(id);
+    if(el){
+      el.addEventListener('input', updateConfirmButton);
+      el.addEventListener('change', updateConfirmButton);
+      el.addEventListener('blur', updateConfirmButton);
+    }
+  });
+
+  updateConfirmButton();
+});
+</script>
+
+<script id="tiktok-bunny-events">
+document.addEventListener('DOMContentLoaded', function(){
+  const form = document.getElementById('orderForm');
+  if(!form) return;
+
+  form.addEventListener('submit', function(){
+    if(!window.ttq || typeof window.ttq.track !== 'function') return;
+
+    const q = document.getElementById('quantity');
+    const quantity = q ? q.value : '1';
+    const value = quantity === '2' ? 4999 : 2999;
+
+    ttq.track('InitiateCheckout', {
+      content_id: 'bunny-bra',
+      content_name: 'Bunny Bra',
+      content_type: 'product',
+      quantity: Number(quantity),
+      value: value,
+      currency: 'PKR'
+    });
+
+    ttq.track('Purchase', {
+      content_id: 'bunny-bra',
+      content_name: 'Bunny Bra',
+      content_type: 'product',
+      quantity: Number(quantity),
+      value: value,
+      currency: 'PKR'
+    });
+  }, true);
+});
+</script>
+
 </body></html>
