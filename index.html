@@ -204,6 +204,26 @@ body.thankyou #thanks{display:flex!important;min-height:100vh!important}
   }
 }
 </style>
+
+<style id="hide-notification-thankyou-final">
+html.thankyou-page #order-pop,
+body.thankyou #order-pop,
+body.thankyou-mode #order-pop{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+</style>
+
+<script id="hide-notification-thankyou-js">
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  if(p.get('thank_you') === '1'){
+    document.documentElement.classList.add('thankyou-page');
+  }
+})();
+</script>
 </head><body>
 <div class="topbar">💗 CUTE BUNNY COLLECTION • SOFT LOOK • ORDER ONLINE</div>
 <header><div class="wrap nav"><div class="logo">Bunny<span class="heart">Bra ♥</span><small>CUTE • COZY • PLAYFUL</small></div>
