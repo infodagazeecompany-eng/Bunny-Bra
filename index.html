@@ -102,6 +102,27 @@ body.thankyou>header,body.thankyou>main,body.thankyou>footer,.thankyou .order-po
   }
 }
 </style>
+
+<script id="thankyou-boot">
+(function(){
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('thank_you') === '1') {
+      document.documentElement.classList.add('thankyou-page');
+      document.addEventListener('DOMContentLoaded', function(){
+        document.body.classList.add('thankyou');
+      });
+    }
+  } catch(e) {}
+})();
+</script>
+
+<style id="thankyou-final-fix">
+html.thankyou-page body > *:not(#thanks){display:none!important}
+html.thankyou-page body #thanks{display:flex!important;min-height:100vh!important}
+body.thankyou > *:not(#thanks){display:none!important}
+body.thankyou #thanks{display:flex!important;min-height:100vh!important}
+</style>
 </head><body>
 <div class="topbar">💗 CUTE BUNNY COLLECTION • SOFT LOOK • ORDER ONLINE</div>
 <header><div class="wrap nav"><div class="logo">Bunny<span class="heart">Bra ♥</span><small>CUTE • COZY • PLAYFUL</small></div>
@@ -154,8 +175,53 @@ body.thankyou>header,body.thankyou>main,body.thankyou>footer,.thankyou .order-po
 <footer>© 2026 BunnyBra • Made for a cute aesthetic 🐰💗</footer>
 <section id="thanks"><div class="thanks-card"><div class="check">✓</div><h1 style="font-size:38px;letter-spacing:-1px">Order Placed Successfully!</h1><p style="color:#766b73;line-height:1.6">Aap ka order successfully receive ho gaya hai. Hamari team aap se confirmation ke liye contact karegi.</p><a class="btn" href="?">Back to Website</a></div></section>
 <script>
-const q=document.getElementById('quantity'),total=document.getElementById('total');q.addEventListener('change',()=>total.textContent=q.value==='2'?'Rs. 2,499':'Rs. 2,999');
-document.getElementById('orderForm').addEventListener('submit',e=>{e.preventDefault();const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='ORDER SUBMITTING...';setTimeout(()=>{window.location.href=window.location.pathname+'?thank_you=1'},700)});
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPVzjh4BU5g4bpioW9Suo38Aq8j1yM7W2LHZvgpwVoyOCdH16gSaDX5lyAy18wuRf2/exec';
+
+const quantityEl = document.getElementById('quantity');
+const totalEl = document.getElementById('total');
+
+function updateTotal(){
+  totalEl.textContent = quantityEl.value === '2' ? 'Rs. 4,999' : 'Rs. 2,999';
+}
+quantityEl.addEventListener('change', updateTotal);
+updateTotal();
+
+document.getElementById('orderForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'ORDER SUBMITTING...';
+
+  const quantity = quantityEl.value;
+  const total = quantity === '2' ? '4999' : '2999';
+
+  const params = new URLSearchParams();
+  params.append('product', 'Bunny Bra');
+  params.append('quantity', quantity);
+  params.append('size', document.getElementById('size').value.trim());
+  params.append('name', document.getElementById('name').value.trim());
+  params.append('phone', document.getElementById('phone').value.trim());
+  params.append('address', document.getElementById('address').value.trim());
+  params.append('landmark', document.getElementById('landmark').value.trim());
+  params.append('city', document.getElementById('city').value.trim());
+  params.append('total', total);
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body: params.toString()
+    });
+
+    window.location.href = window.location.pathname + '?thank_you=1';
+  } catch (error) {
+    btn.disabled = false;
+    btn.textContent = 'CONFIRM MY ORDER 💗';
+    alert('Order submit nahi hua. Please dobara try karein.');
+  }
+});
 const sampleOrders = [
   {name:'Ayesha', city:'Lahore'},
   {name:'Sana', city:'Karachi'},
