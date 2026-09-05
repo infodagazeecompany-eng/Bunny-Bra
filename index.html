@@ -205,10 +205,9 @@ body.thankyou #thanks{display:flex!important;min-height:100vh!important}
 }
 </style>
 
-<style id="hide-notification-thankyou-final">
+<style id="thankyou-only-popup-hide">
 html.thankyou-page #order-pop,
-body.thankyou #order-pop,
-body.thankyou-mode #order-pop{
+body.thankyou #order-pop {
   display:none!important;
   visibility:hidden!important;
   opacity:0!important;
@@ -216,45 +215,18 @@ body.thankyou-mode #order-pop{
 }
 </style>
 
-<script id="hide-notification-thankyou-js">
+<script id="thankyou-only-popup-guard">
 (function(){
-  const p = new URLSearchParams(window.location.search);
-  if(p.get('thank_you') === '1'){
-    document.documentElement.classList.add('thankyou-page');
+  if (new URLSearchParams(window.location.search).get('thank_you') !== '1') return;
+  function hide(){
+    var p=document.getElementById('order-pop');
+    if(p){
+      p.style.setProperty('display','none','important');
+      p.style.setProperty('visibility','hidden','important');
+    }
   }
-})();
-</script>
-
-<style id="thankyou-no-popup-final">
-body.thankyou #order-pop,
-body.thankyou .order-pop,
-html.thankyou-page #order-pop,
-html.thankyou-page .order-pop,
-body:has(#thanks) #order-pop,
-body:has(#thanks) .order-pop {
-  display:none!important;
-  visibility:hidden!important;
-  opacity:0!important;
-  width:0!important;
-  height:0!important;
-  overflow:hidden!important;
-  pointer-events:none!important;
-}
-</style>
-
-<script id="thankyou-popup-guard">
-(function(){
-  const isThankYou = new URLSearchParams(location.search).get('thank_you') === '1';
-  if(!isThankYou) return;
-  function killPopup(){
-    const p=document.getElementById('order-pop');
-    if(p){ p.remove(); }
-    document.querySelectorAll('.order-pop').forEach(function(el){ el.remove(); });
-  }
-  killPopup();
-  document.addEventListener('DOMContentLoaded', killPopup);
-  window.addEventListener('load', killPopup);
-  setInterval(killPopup, 500);
+  hide();
+  document.addEventListener('DOMContentLoaded', hide);
 })();
 </script>
 </head><body>
@@ -365,34 +337,7 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
 </script>
 
 
-<script id="ladies-notification-final-js">
-document.addEventListener('DOMContentLoaded', function(){
-  const orders = [
-    ['Ayesha','Lahore'],['Sana','Karachi'],['Hira','Islamabad'],['Maham','Rawalpindi'],
-    ['Iqra','Faisalabad'],['Zoya','Multan'],['Alina','Peshawar'],['Anaya','Gujranwala'],
-    ['Eman','Sialkot'],['Mehwish','Hyderabad']
-  ];
-  let i=0;
-  const pop=document.getElementById('order-pop');
-  if(!pop) return;
-  let title=pop.querySelector('b');
-  if(!title){ title=document.createElement('b'); pop.prepend(title); }
-  title.textContent='🛍️ Recent Order';
-  let text=document.getElementById('orderText');
-  if(!text){ text=document.createElement('span'); text.id='orderText'; pop.appendChild(text); }
 
-  function show(){
-    const [name,city]=orders[i];
-    text.textContent=name+' from '+city+' just ordered Bunny Bra 💗';
-    i=(i+1)%orders.length;
-    pop.style.setProperty('display','block','important');
-    pop.style.setProperty('visibility','visible','important');
-    pop.style.setProperty('opacity','1','important');
-  }
-  show();
-  setInterval(show,3500);
-});
-</script>
 
 
 
@@ -458,4 +403,40 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+
+<script id="order-rotation-final">
+document.addEventListener('DOMContentLoaded', function(){
+  const pop = document.getElementById('order-pop');
+  if(!pop) return;
+
+  const orders = [
+    ['Ayesha','Lahore'],
+    ['Sana','Karachi'],
+    ['Hira','Islamabad'],
+    ['Maham','Rawalpindi'],
+    ['Iqra','Faisalabad'],
+    ['Zoya','Multan'],
+    ['Alina','Peshawar'],
+    ['Anaya','Gujranwala'],
+    ['Eman','Sialkot'],
+    ['Mehwish','Hyderabad']
+  ];
+
+  const text = document.getElementById('orderText');
+  const title = pop.querySelector('b');
+  let index = 0;
+
+  if(title) title.textContent = '🛍️ Recent Order';
+
+  function showNext(){
+    if(new URLSearchParams(location.search).get('thank_you') === '1') return;
+    const order = orders[index];
+    if(text) text.textContent = order[0] + ' from ' + order[1] + ' just ordered Bunny Bra 💗';
+    index = (index + 1) % orders.length;
+  }
+
+  showNext();
+  setInterval(showNext, 3500);
+});
+</script>
 </body></html>
